@@ -5,7 +5,7 @@ alias lol='/mnt/c/Riot\ Games/League\ of\ Legends/LeagueClient.exe'
 alias exp='explorer.exe'
 alias nv='nvim'
 alias note='nvim ~/.scripts/note'
-alias rel='source ~/.bashrc'
+alias rel='source ~/.bashrc && echo bashrc reloaded'
 
 # Fetch the gitignore file template for a project
 gitignore(){
