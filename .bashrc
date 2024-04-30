@@ -121,6 +121,9 @@ export EDITOR="$VISUAL"
 alias rm='mv -t ~/.trash/'
 alias del='/bin/rm -I'
 
+# # nvim backup
+# alias nvold='NVIM_APPNAME="nvim-old" nvim'
+
 # cd () {
 #     if [ $# -eq 0 ]; then
 #         builtin cd .;
