@@ -24,7 +24,7 @@ cdd(){
 
 # Get a default makefile
 makefile(){
-    cp ~/.scripts/makefile $(pwd)/$1/makefile
+    cp ~/.scripts/resx/makefile $(pwd)/$1/makefile
 }
 
 # fzf for a directory
