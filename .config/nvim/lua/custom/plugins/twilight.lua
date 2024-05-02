@@ -1,5 +1,6 @@
 return {
 	"folke/twilight.nvim",
+  lazy = true,
 	opts = {
 		-- These are the default configs
 		dimming = {
