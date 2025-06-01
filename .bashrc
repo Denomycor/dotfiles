@@ -104,7 +104,7 @@ fi
 
 # Custom:
 
-PATH="/usr/bin/nvim-linux64/bin:$PATH"
+PATH="/usr/bin/nvim-linux-x86_64/bin:$PATH"
 PATH="/home/afonso/.local/bin:$PATH"
 
 export PS1='\[\e[38;5;214m\]\t \w\\$ \[\e[0m\]'
