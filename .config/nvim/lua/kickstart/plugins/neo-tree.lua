@@ -57,6 +57,12 @@ return {
 	opts = {
 		popup_border_style = "rounded",
 		filesystem = {
+      filtered_items = {
+        hide_by_pattern = {
+          -- https://practical.li/neovim/neovim-basics/file-buffer-window-tab/#key-bindings-within-neo-tree
+          "*.uid"
+        }
+      },
 			hijack_netrw_behavior = "open_current",
 			window = {
         width = 30,

@@ -104,11 +104,14 @@ fi
 
 # Custom:
 
-PATH="/usr/bin/nvim-linux64/bin:$PATH"
+PATH="/usr/bin/nvim-linux-x86_64/bin:$PATH"
 PATH="/home/afonso/.local/bin:$PATH"
 
-export PS1='\[\e[38;5;214m\]\t \w\\$ \[\e[0m\]'
+# export PS1='\[\e[38;5;214m\]\t \w\\$ \[\e[0m\]' # Simple
+# export PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null)'; export PS1='\[\e[38;5;214m\]\t \w@${PS1_CMD1}\\$ \[\e[0m\]' # branch right
+export PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null | awk '"'"'length($0) > 0 {print $0"@"}'"'"')'; export PS1='\[\e[38;5;214m\]\t ${PS1_CMD1}\w\\$ \[\e[0m\]' # branch left
 export LS_COLORS='di=0;91:ow=0;91:ex=0:'
+export RUST_SRC_PATH='~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust'
 
 export CLANGD_FLAGS=
 #'--completion-style=detailed'
@@ -140,3 +143,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+
+[ -f "/home/afonso/.ghcup/env" ] && . "/home/afonso/.ghcup/env" # ghcup-env
+. "$HOME/.cargo/env"

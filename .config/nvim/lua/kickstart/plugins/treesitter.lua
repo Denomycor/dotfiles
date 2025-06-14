@@ -31,6 +31,7 @@ return {
 			--
 			--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
 			--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+
 		end,
 	},
 	-- Remember these keymaps
