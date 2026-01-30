@@ -1,0 +1,22 @@
+[user]
+    email = afonsoresteves@hotmail.com
+    name = Denomycor
+[alias]
+    last = log -1 HEAD
+    lazy = "!f() { git add . && git commit -m \"$@\";}; f"
+    net = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    ls = log --oneline
+    amend = commit --amend --no-edit
+    rename = commit --amend -m
+    search = !git rev-list --all | xargs git grep -F
+    cd = checkout
+    s = status
+    b = branch
+    tree = "!tree --gitignore"
+    hash = "!f() { git rev-parse --verify HEAD$@;}; f"
+    fork = switch -c
+    rewind = reset --hard HEAD^
+
+[init]
+    defaultBranch = main
+
