@@ -106,7 +106,7 @@ fi
 
 PATH="/usr/bin/nvim-linux-x86_64/bin:$PATH"
 PATH="/home/afonso/.local/bin:$PATH"
-
+PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 # export PS1='\[\e[38;5;214m\]\t \w\\$ \[\e[0m\]' # Simple
 # export PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null)'; export PS1='\[\e[38;5;214m\]\t \w@${PS1_CMD1}\\$ \[\e[0m\]' # branch right
 export PROMPT_COMMAND='PS1_CMD1=$(git branch --show-current 2>/dev/null | awk '"'"'length($0) > 0 {print $0"@"}'"'"')'; export PS1='\[\e[38;5;214m\]\t ${PS1_CMD1}\w\\$ \[\e[0m\]' # branch left
@@ -116,20 +116,13 @@ export RUST_SRC_PATH='/home/afonso/.rustup/toolchains/stable-x86_64-unknown-linu
 export CLANGD_FLAGS=
 #'--completion-style=detailed'
 
+# Set up fzf key bindings and fuzzy completion
+eval "$(fzf --bash)"
+eval "$(zoxide init --cmd cd bash)"
+
 # nvim as default editor
 export VISUAL=nvim
 export EDITOR="$VISUAL"
-
-# cd () {
-#     if [ $# -eq 0 ]; then
-#         builtin cd .;
-#     else
-#         builtin cd "$@";
-#     fi
-# }
-
-# Start zoxide
-# eval "$(zoxide init --cmd cd bash)"
 
 # NVM
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
