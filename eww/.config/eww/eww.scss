@@ -1,0 +1,71 @@
+* {
+  all: unset; // Unsets everything so you can style everything from scratch
+}
+
+.bar {
+  background-color: #121212;
+  color: #b0b4bc;
+  font-size: 13;
+  font-weight: bold;
+  border-radius: 20px;
+  border-style: solid;
+  border-color: #33ccff;
+  border-width: 2px
+}
+
+
+// Styles on classes (see eww.yuck for more information)
+
+
+.info_box {
+  padding-right: 5px;
+  padding-left: 5px;
+  border-style: hidden;
+}
+
+.battery_box {
+  background-color: #9e5c4d;
+  padding-left: 10px;
+  border-style: hidden;
+  border-radius: 20px 0px 0px 20px;
+}
+
+.wifi_box {
+  background-color: #3d5a80;
+}
+
+.clock_box {
+  background-color: #3f5166;
+}
+
+.audio_box {
+  background-color: #d62828;
+}
+
+.info_box.clock_box {
+  border-radius: 0px 13px 13px 0px;
+  padding-right: 8px;
+}
+
+.icon_box {
+  font-size: 16px;
+}
+
+.ws_button {
+  padding-right: 10px;
+  padding-left: 10px;
+  border-style: hidden;
+  font-size: 14;
+}
+
+/* .workspaces > :first-child { */
+/*   border-radius: 13px 0px 0px 13px; */
+/* } */
+
+.workspace-active-focused {
+  background-color: #aa4444;
+  border-style: hidden;
+  border-radius: 20px;
+  
+}
+
