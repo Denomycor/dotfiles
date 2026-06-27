@@ -91,12 +91,12 @@ return {
             }
           })
 
-          -- vim.lsp.config("godot", {
-          --   cmd = vim.lsp.rpc.connect('127.0.0.1', 7011),
-          --   filetypes = { "gdscript", "gdshader", "gdshaderinc" },
-          --   root_dir = vim.fs.root(0, { "project.godot", ".git" }),
-          -- })
-          -- vim.lsp.enable("godot")
+          vim.lsp.config("godot", {
+            cmd = vim.lsp.rpc.connect('127.0.0.1', 7011),
+            filetypes = { "gdscript", "gdshader", "gdshaderinc" },
+            root_dir = vim.fs.root(0, { "project.godot", ".git" }),
+          })
+          vim.lsp.enable("godot")
 
         end
       },

@@ -1,0 +1,92 @@
+(defpoll time :interval "1m" :initial "initial-value" `date +%H:%M`)
+(defpoll wifi_name :interval "5s" :initial "initial-value" `nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d : -f 2`)
+(defpoll wifi_signal :interval "5s" :initial "initial-value" `nmcli -f ACTIVE,SSID,SIGNAL dev wifi | awk '$1=="yes"{print $3}'`)
+(defpoll battery_charge :interval "60s" :initial "initial-value" `upower -i $(upower -e | grep battery) | grep -E "percentage" | cut -f 2 -d : | tr -d '[:space:]%'`)
+
+(deflisten audio "./scripts/audio.sh")
+(deflisten workspaces_monitor0 "./scripts/workspaces.sh 0")
+(deflisten workspaces_monitor1 "./scripts/workspaces.sh 1")
+
+(defwindow bar
+    :monitor '["<primary>", 0]'
+    :class "bar"
+    :geometry (geometry :x "0%"
+        :y "10px"
+        :width "98%"
+        :height "30px"
+        :anchor "top center")
+        :exclusive true
+    :stacking "fg"
+    (bar)
+)
+
+;; containers
+
+(defwidget bar []
+    (centerbox :orientation "h"
+        (workspaces :monitor 0)
+        (box)
+        (right_widgets)
+    )
+)
+
+(defwidget workspaces [monitor]
+    (box :class "workspaces" :orientation "h" :space-evenly false :halign "start"
+        (for workspace in {monitor == 0 ? workspaces_monitor0 : workspaces_monitor1}
+            (button :class "ws_button ${workspace.active ? (workspace.focused ? "workspace-active-focused" : "workspace-active-unfocused") : "workspace-inactive"}"
+                :onclick "hyprctl dispatch workspace ${workspace.id}"
+                "${workspace.id}"
+            )
+        )
+    )
+)
+
+
+(defwidget right_widgets []
+    (box :class "right_widgets" :orientation "h" :halign "end" :space-evenly false
+        (info_box :classo "battery_box" 
+            (icon_box :classo "" {battery_charge < "80" ? battery_charge < "30" ? "󰁻":"󰁾":"󰁹"})
+            (hspacer :space 8)
+            "${battery_charge}%"
+        )
+        (info_box :classo "wifi_box"
+            (icon_box :classo "" {wifi_name == "" ? "󰤫":"󰤨"})
+            (hspacer :space 10)
+            "${wifi_name} (${wifi_signal}%)"
+        )
+        (info_box :classo "audio_box" 
+            (icon_box :classo "" {audio.volume < "50" ? audio.volume < "1" ? "󰝟":"󰖀":"󰕾"})
+            (hspacer :space 8)
+            "${audio.volume}%"
+        )
+        (info_box :classo "clock_box" 
+            (icon_box :classo "" "󰥔")
+            (hspacer :space 8)
+            time
+        )
+    )
+)
+
+
+;; building blocks
+
+(defwidget icon_box [classo] 
+    (box :class "icon_box ${classo}"
+        (children)
+    )
+)
+
+(defwidget info_box [classo]
+    (box :class "info_box ${classo}" :space-evenly false
+        (children)
+    )
+)
+
+(defwidget hspacer [space]
+    (box :class "spacer" :width space)
+)
+
+;; 󰚥 → Lightning bolt (general charging)
+
+;; vim: ts=4 sts=4 sw=4 et
+
