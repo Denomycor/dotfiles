@@ -5,6 +5,7 @@
 
 (deflisten audio "./scripts/audio.sh")
 (deflisten power_profile "./scripts/power_profile.sh")
+(deflisten brightness "./scripts/brightness.sh")
 (deflisten workspaces_monitor0 "./scripts/workspaces.sh 0")
 (deflisten workspaces_monitor1 "./scripts/workspaces.sh 1")
 
@@ -49,6 +50,11 @@
             (icon_box :classo "" {battery_charge < "80" ? battery_charge < "30" ? "󰁻":"󰁾":"󰁹"})
             (hspacer :space 8)
             "${battery_charge}%"
+        )
+        (info_box :classo "brightness_box"
+            (icon_box :classo "" {brightness < "33" ? "󰃞" : brightness < "66" ? "󰃟" : "󰃠"})
+            (hspacer :space 8)
+            "${brightness}%"
         )
         (info_box :classo "power_box"
             (icon_box :classo "" {power_profile == "power-saver" ? "󰌪" : power_profile == "performance" ? "󰓅" : "󰾉"})
