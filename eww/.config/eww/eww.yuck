@@ -1,8 +1,7 @@
 (defpoll time :interval "1m" :initial "initial-value" `date +%H:%M`)
 (defpoll wifi_name :interval "5s" :initial "initial-value" `nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d : -f 2`)
 (defpoll wifi_signal :interval "5s" :initial "initial-value" `nmcli -f ACTIVE,SSID,SIGNAL dev wifi | awk '$1=="yes"{print $3}'`)
-(defpoll battery_charge :interval "60s" :initial "initial-value" `upower -i $(upower -e | grep battery) | grep -E "percentage" | cut -f 2 -d : | tr -d '[:space:]%'`)
-
+(deflisten battery "./scripts/battery.sh")
 (deflisten audio "./scripts/audio.sh")
 (deflisten power_profile "./scripts/power_profile.sh")
 (deflisten brightness "./scripts/brightness.sh")
@@ -62,9 +61,9 @@
 (defwidget right_widgets []
     (box :class "right_widgets" :orientation "h" :halign "end" :space-evenly false
         (info_box :classo "battery_box"
-            (icon_box :classo "" {battery_charge < "80" ? battery_charge < "30" ? "󰁻":"󰁾":"󰁹"})
+            (icon_box :classo "" {battery.state == "charging" ? "󰂄" : battery.charge < "80" ? battery.charge < "30" ? "󰁻":"󰁾":"󰁹"})
             (hspacer :space 8)
-            "${battery_charge}%"
+            "${battery.charge}%"
         )
         (info_box :classo "brightness_box"
             (icon_box :classo "" {brightness < "33" ? "󰃞" : brightness < "66" ? "󰃟" : "󰃠"})
