@@ -8,6 +8,7 @@
 (deflisten brightness "./scripts/brightness.sh")
 (deflisten workspaces_monitor0 "./scripts/workspaces.sh 0")
 (deflisten workspaces_monitor1 "./scripts/workspaces.sh 1")
+(deflisten notifications :initial "[]" "./scripts/notification_daemon.py")
 
 (defwindow bar
     :monitor '["<primary>", 0]'
@@ -20,6 +21,20 @@
         :exclusive true
     :stacking "fg"
     (bar)
+)
+
+(defwindow notifications
+    :monitor '["<primary>", 0]'
+    :class "notifications_window"
+    :geometry (geometry :x "0%"
+        :y "50px"
+        :width "300px"
+        :height "1px"
+        :anchor "top right")
+    :exclusive false
+    :focusable false
+    :stacking "overlay"
+    (notification_popups)
 )
 
 ;; containers
@@ -79,6 +94,20 @@
     )
 )
 
+
+(defwidget notification_popups []
+    (box :class "notification_popups" :orientation "v" :space-evenly false :halign "end" :valign "start"
+        (for notif in notifications
+            (box :class "notification" :orientation "h" :space-evenly false
+                (image :class "notification-icon" :path {notif.icon} :image-width 40 :image-height 40 :visible {notif.icon != ""})
+                (box :orientation "v" :space-evenly false :halign "start" :hexpand true
+                    (label :class "notification-title" :halign "start" :limit-width 30 :text {notif.summary})
+                    (label :class "notification-body" :halign "start" :wrap true :text {notif.body})
+                )
+            )
+        )
+    )
+)
 
 ;; building blocks
 
