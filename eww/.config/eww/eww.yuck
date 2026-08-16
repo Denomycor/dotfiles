@@ -4,6 +4,7 @@
 (defpoll battery_charge :interval "60s" :initial "initial-value" `upower -i $(upower -e | grep battery) | grep -E "percentage" | cut -f 2 -d : | tr -d '[:space:]%'`)
 
 (deflisten audio "./scripts/audio.sh")
+(deflisten power_profile "./scripts/power_profile.sh")
 (deflisten workspaces_monitor0 "./scripts/workspaces.sh 0")
 (deflisten workspaces_monitor1 "./scripts/workspaces.sh 1")
 
@@ -44,10 +45,15 @@
 
 (defwidget right_widgets []
     (box :class "right_widgets" :orientation "h" :halign "end" :space-evenly false
-        (info_box :classo "battery_box" 
+        (info_box :classo "battery_box"
             (icon_box :classo "" {battery_charge < "80" ? battery_charge < "30" ? "󰁻":"󰁾":"󰁹"})
             (hspacer :space 8)
             "${battery_charge}%"
+        )
+        (info_box :classo "power_box"
+            (icon_box :classo "" {power_profile == "power-saver" ? "󰌪" : power_profile == "performance" ? "󰓅" : "󰾉"})
+            (hspacer :space 8)
+            {power_profile == "power-saver" ? "Saver" : power_profile == "performance" ? "Perf" : "Balanced"}
         )
         (info_box :classo "wifi_box"
             (icon_box :classo "" {wifi_name == "" ? "󰤫":"󰤨"})
