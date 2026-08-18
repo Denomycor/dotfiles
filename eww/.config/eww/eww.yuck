@@ -1,6 +1,5 @@
-(defpoll time :interval "1m" :initial "initial-value" `date +%H:%M`)
-(defpoll wifi_name :interval "5s" :initial "initial-value" `nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d : -f 2`)
-(defpoll wifi_signal :interval "5s" :initial "initial-value" `nmcli -f ACTIVE,SSID,SIGNAL dev wifi | awk '$1=="yes"{print $3}'`)
+(deflisten wifi "./scripts/wifi.sh")
+(deflisten time "./scripts/time.sh")
 (deflisten battery "./scripts/battery.sh")
 (deflisten audio "./scripts/audio.sh")
 (deflisten power_profile "./scripts/power_profile.sh")
@@ -76,9 +75,9 @@
             {power_profile == "power-saver" ? "Saver" : power_profile == "performance" ? "Perf" : "Balanced"}
         )
         (info_box :classo "wifi_box"
-            (icon_box :classo "" {wifi_name == "" ? "󰤫":"󰤨"})
+            (icon_box :classo "" {wifi.ssid == "" ? "󰤫":"󰤨"})
             (hspacer :space 10)
-            "${wifi_name} (${wifi_signal}%)"
+            "${wifi.ssid} (${wifi.signal}%)"
         )
         (info_box :classo "audio_box" 
             (icon_box :classo "" {audio.muted ? "󰝟" : audio.volume < "50" ? audio.volume < "1" ? "󰝟" : "󰖀" : "󰕾"})
