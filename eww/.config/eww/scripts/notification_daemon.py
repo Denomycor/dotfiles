@@ -15,10 +15,18 @@ Some clients (e.g. Discord) don't pass an icon path at all -- they embed
 the raw pixel data via the "image-data"/"icon_data" hint instead. That's
 decoded with GdkPixbuf and written out as a PNG under /tmp so the eww
 `image` widget (which only takes a file path) has something to point at.
+
+Do-not-disturb is controlled out-of-band over a unix socket (see the
+`dnd` CLI) rather than DBus, since it's a local-only concern with no
+freedesktop notifications spec equivalent. When dnd is on, incoming
+notifications are neither displayed nor announced with a sound -- they're
+acknowledged to the caller (a valid id is returned) and otherwise dropped.
+`mute`/`unmute` just silence/restore the sound while leaving popups on.
 """
 
 import json
 import os
+import socket
 import subprocess
 import sys
 import tempfile
@@ -33,6 +41,9 @@ from gi.repository import Gio, GLib, GdkPixbuf
 BUS_NAME = "org.freedesktop.Notifications"
 OBJECT_PATH = "/org/freedesktop/Notifications"
 LIFETIME_MS = 5000
+SOCKET_PATH = os.path.join(
+    os.environ.get("XDG_RUNTIME_DIR", tempfile.gettempdir()), "eww-notification-daemon.sock"
+)
 
 INTROSPECTION_XML = """
 <node>
@@ -75,6 +86,49 @@ INTROSPECTION_XML = """
 notifications = {}
 next_id = 1
 ICON_DIR = tempfile.gettempdir()
+dnd_enabled = False
+muted = False
+
+
+def handle_dnd_command(fd, condition, sock):
+    global dnd_enabled, muted
+
+    conn, _ = sock.accept()
+    try:
+        command = conn.recv(64).decode().strip()
+        if command == "on":
+            dnd_enabled = True
+            reply = "dnd on"
+        elif command == "off":
+            dnd_enabled = False
+            reply = "dnd off"
+        elif command == "mute":
+            muted = True
+            reply = "muted"
+        elif command == "unmute":
+            muted = False
+            reply = "unmuted"
+        elif command == "status":
+            reply = json.dumps({"dnd": dnd_enabled, "muted": muted})
+        else:
+            reply = f"unknown command: {command}"
+        conn.sendall((reply + "\n").encode())
+    finally:
+        conn.close()
+    return True
+
+
+def start_dnd_socket():
+    try:
+        os.remove(SOCKET_PATH)
+    except OSError:
+        pass
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.bind(SOCKET_PATH)
+    sock.listen(5)
+    sock.setblocking(False)
+    GLib.io_add_watch(sock.fileno(), GLib.IO_IN, handle_dnd_command, sock)
+    return sock
 
 
 def extract_icon(notif_id, hints, app_icon):
@@ -145,6 +199,10 @@ def handle_method_call(
         if not replaces_id:
             next_id += 1
 
+        if dnd_enabled:
+            invocation.return_value(GLib.Variant("(u)", (notif_id,)))
+            return
+
         icon = extract_icon(notif_id, hints, app_icon)
 
         notifications[notif_id] = {
@@ -156,7 +214,7 @@ def handle_method_call(
         }
         emit_state()
 
-        if not hints.get("suppress-sound"):
+        if not muted and not hints.get("suppress-sound"):
             sound_file = hints.get("sound-file")
             if sound_file:
                 if sound_file.startswith("file://"):
@@ -211,6 +269,7 @@ def on_name_lost(connection, name):
 
 def main():
     emit_state()
+    start_dnd_socket()
     Gio.bus_own_name(
         Gio.BusType.SESSION,
         BUS_NAME,

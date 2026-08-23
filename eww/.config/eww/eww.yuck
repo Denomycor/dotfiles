@@ -75,7 +75,11 @@
             {power_profile == "power-saver" ? "Saver" : power_profile == "performance" ? "Perf" : "Balanced"}
         )
         (info_box :classo "wifi_box"
-            (icon_box :classo "" {wifi.ssid == "" ? "󰤫":"󰤨"})
+            (icon_box :classo "" { wifi.ssid == "Disconnected" ? "󰤫" :
+                wifi.signal > 75 ? '󰤨' : 
+                wifi.signal > 50 ? '󰤥' : 
+                wifi.signal > 25 ? '󰤢' : 
+                wifi.signal > 0  ? '󰤟' : '󰤯'})
             (hspacer :space 10)
             "${wifi.ssid} (${wifi.signal}%)"
         )
