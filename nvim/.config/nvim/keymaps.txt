@@ -1,0 +1,324 @@
+NEOVIM KEYMAPS
+==============
+
+Leader is <Space>. "Default" = Neovim's own mapping for the same key/action.
+Modes: n = normal, x = visual, o = operator-pending (after d, c, y, ...), i = insert.
+Search keymaps live with :Telescope keymaps (<leader>sk) or which-key (<leader>?).
+
+
+PT-PT KEYBOARD ALIASES                                          (keymaps.lua)
+-----------------------------------------------------------------------------
+[ and ] need AltGr+8 / AltGr+9 on a PT-PT layout, so ç and º stand in for
+them in n/x/o modes. They work with EVERY [ / ] mapping below; the original
+[ and ] keys still work too.
+
+  ç  -> [            º  -> ]
+  çç -> [[           ºº -> ]]          (two-bracket motions need their own maps)
+  çº -> []           ºç -> ][
+
+  e.g.  ºd = ]d   çq = [q   ºf = ]f   2ç<Space> = 2[<Space>
+  Not covered: [{ ]} [( ]) still need AltGr for the brace/paren.
+
+
+LSP                                       (plugins/lsp.lua, LSP buffers only)
+-----------------------------------------------------------------------------
+  Key            Action                              Default
+  gd             Definition (Telescope)              <C-]> (tagfunc)
+  gD             Declaration                         -
+  gr             References (Telescope)              grr  (removed)
+  gI             Implementation (Telescope)          gri  (removed)
+  gT             Type definition (Telescope)         grt  (removed)
+                 ! overrides gT = previous tab in LSP buffers
+  K              Hover                               K
+  <C-k>          Signature help (normal)             <C-s> in insert
+  <leader>rn     Rename                              grn  (removed)
+  <leader>ca     Code action (n + x, range in x)     gra  (removed)
+  <leader>ds     Document symbols (Telescope)        gO
+  <leader>ps     Workspace symbols (Telescope)       -
+  <leader>th     Toggle inlay hints                  -
+  <leader>ch     Switch source/header (clangd only)  -
+
+  The 0.11 defaults grn/gra/grr/gri/grt are deleted so `gr` doesn't wait.
+
+
+DIAGNOSTICS                                                     (keymaps.lua)
+-----------------------------------------------------------------------------
+  ]d / [d        Next / prev diagnostic + float      ]d / [d (no float)
+  ]D / [D        Last / first diagnostic             (default, unchanged)
+  <leader>vf     Diagnostic float                    <C-w>d
+  <leader>q      Diagnostics -> location list        -
+  <leader>pd     All diagnostics (Telescope)         -
+
+
+QUICKFIX / LOCATION LIST
+-----------------------------------------------------------------------------
+  ]q / [q        Next / prev quickfix item           (default)
+  ]Q / [Q        Last / first quickfix item          (default)
+  ]<C-q> [<C-q>  Next / prev file in quickfix        (default)
+  <leader>k      Next location-list item, centred    ]l
+  <leader>j      Prev location-list item, centred    [l
+  ]L / [L        Last / first location-list item     (default)
+  :copen :cclose :lopen :lclose                      open / close the lists
+
+
+FUNCTION / CODE NAVIGATION
+-----------------------------------------------------------------------------
+  ]f / [f        Next / prev function start   (treesitter-textobjects, any lang)
+  ]F / [F        Next / prev function end     (treesitter-textobjects, any lang)
+  ]] / [[        Next / prev function         (default; C: `{` in column 0,
+                                               Python: top-level def/class)
+  ][ / []        Next / prev function end     (default; C: `}` in column 0)
+  ]m / [m        Next / prev method start     (default; C++ classes, Python def)
+  ]M / [M        Next / prev method end       (default)
+  [{ / ]}        Start / end of enclosing { } block (default, C-like)
+  [( / ])        Start / end of enclosing ( )       (default)
+  %              Matching bracket                   (default)
+  [# / ]#        Prev / next #if #else #endif       (default, C)
+  <leader>o      Toggle Outline symbol sidebar      (outline.nvim)
+
+
+SEARCH / FILES (Telescope)                                   (telescope.lua)
+-----------------------------------------------------------------------------
+  <leader>pf     Find files (follows symlinks)
+  <leader>pg     Git files
+  <leader>pt     Live grep in project
+  <leader>po     Live grep in open files
+  <leader>pr     Recent files
+  <leader>pb     Open buffers
+  <leader>pc     Resume last picker
+  <leader>sw     Grep word under cursor
+  <leader>b      Fuzzy search in current buffer
+  <leader>sh     Help tags
+  <leader>sk     Keymaps
+  <leader>st     All Telescope pickers
+  <leader>sn     Neovim config files
+
+  Inside a picker (insert mode):
+    <C-n>/<C-p>  move          <CR>   open          <C-x>  open in split
+    <C-v>        open in vsplit           <C-t>  open in tab
+    <C-u>/<C-d>  scroll preview           <Tab>  toggle selection
+    <C-q>        send all to quickfix     <M-q>  send selected to quickfix
+    <Esc>        normal mode (then ? for help)    <C-c>  close
+
+
+HARPOON                                                        (harpoon.lua)
+-----------------------------------------------------------------------------
+  <leader>ha     Add current file
+  <C-e>          Quick menu   ! overrides <C-e> = scroll down one line
+  <leader>ph     Harpoon list in Telescope
+  <leader>1..4   Jump to file 1..4
+  <C-S-p>        Prev file in list  (may not reach nvim in Windows Terminal/tmux)
+  <C-S-n>        Next file in list
+  Quick menu is a buffer: dd removes, reorder lines, <CR> opens, q closes.
+
+
+FILE TREE (Neo-tree)                                           (neotree.lua)
+-----------------------------------------------------------------------------
+  <leader>tt     Toggle filesystem sidebar
+  <leader>tb     Toggle buffers sidebar
+  <leader>tf     Floating buffers list
+  <leader>tl     Focus / open sidebar
+  `nvim <dir>`   Opens Neo-tree in the current window
+
+  Inside the tree:
+    <CR> open      s vsplit     S split      t tab       P preview
+    a add (end with / for dir)  d delete     r rename    c copy    m move
+    y copy  x cut  p paste      H toggle hidden          R refresh
+    <BS> go up     . set root   / fuzzy find   \ close   ? all keys
+    (f is disabled)
+
+
+UNDO                                              (options.lua, undotree.lua)
+-----------------------------------------------------------------------------
+  Undo history persists across sessions (~/.undodir, 10000 levels).
+  <leader>u      Toggle Undotree (focus moves into it)
+  In Undotree:   j/k move   <CR> restore state   J/K prev / next state
+                 </> prev / next saved state     D toggle diff panel
+                 u / <C-r> undo / redo           <Tab> back to editor
+                 q close    ? help
+
+
+COMPLETION (blink.cmp, "enter" preset)                              (cmp.lua)
+-----------------------------------------------------------------------------
+  <C-Space>      Show menu / toggle docs
+  <CR>           Accept
+  <C-e>          Cancel
+  <C-n>/<C-p>    Next / prev item   (also <Down>/<Up>)
+  <C-f>/<C-b>    Scroll docs down / up
+  <Tab>/<S-Tab>  Jump to next / prev snippet placeholder
+  <C-k>          Toggle signature help
+
+
+EDITING / MOVEMENT TWEAKS                                       (keymaps.lua)
+-----------------------------------------------------------------------------
+  <Esc>          Clear search highlight
+  n / N          Next / prev match, centred         (default: not centred)
+  <C-d> / <C-u>  Half page down / up, centred       (default: not centred)
+  J              Join lines, cursor stays put       (default: cursor moves)
+  F    (n)       Highlight word under cursor        ! overrides F = find back
+  F    (x)       Search for selected text           ! overrides F
+  D              Delete without yanking (operator: Dw, Dd, Dip, ...)
+                                                    ! overrides D = d$
+  <leader>p (x)  Paste over selection, keep register
+  <leader>s      Substitute word under cursor in file
+  <A-Up/Down>(x) Move selected lines up / down
+  gc / gcc       Comment (default, built-in)
+  <C-arrows>     Move between windows               <C-w>h/j/k/l
+  <leader>w      Next window                        <C-w>w
+  <leader>vv     Vertical split                     <C-w>v
+  <leader>vh     Horizontal split                   <C-w>s
+  <leader>?      which-key: buffer-local keymaps
+  Mouse is disabled. Yank/paste uses the system clipboard.
+
+
+=============================================================================
+STANDARD NEOVIM KEYS (refresher, not specific to this config)
+=============================================================================
+Most take a count (5j, 3dw) and work with operators (d, c, y, ...).
+
+MOTIONS
+  h j k l              left down up right
+  w b e  / W B E       word start / back / end   (capital = WORD, by spaces)
+  ge                   end of previous word
+  0 ^ $                line start / first non-blank / line end
+  gg G  42G  :42       first line / last line / line 42
+  f{c} t{c}            to / until char forward   (F T backward; F is remapped)
+  ; ,                  repeat last f/t forward / backward
+  { }                  prev / next paragraph (blank line)
+  ( )                  prev / next sentence
+  H M L                top / middle / bottom of screen
+  * #                  search word under cursor forward / backward
+  gi                   go to last insert position and insert
+  gv                   reselect last visual selection
+
+SCROLLING
+  <C-f> <C-b>          page down / up
+  <C-y>                scroll up one line   (<C-e> is Harpoon here)
+  zz zt zb             cursor line to middle / top / bottom of screen
+
+OPERATORS  (operator + motion/text object, doubled = whole line)
+  d c y                delete / change / yank          dd cc yy
+  > < =                indent / dedent / auto-indent   >> << ==
+  gu gU g~             lower / upper / toggle case     guu gUU
+  gq                   format / wrap text
+  gc                   comment
+  !                    filter through shell command    !ip sort
+
+TEXT OBJECTS  (i = inside, a = around, after an operator or in visual)
+  iw aw / iW aW        word / WORD
+  is as  ip ap         sentence / paragraph
+  i" a"  i' a'  i` a`  quoted string
+  i( a(  (= ib ab)     parentheses
+  i{ a{  (= iB aB)     braces
+  i[ a[  i< a<         brackets / angle brackets
+  it at                HTML/XML tag
+  e.g. ci" change inside quotes, dap delete paragraph, yi{ yank block body
+
+EDITING
+  i a  I A             insert before / after cursor, line start / end
+  o O                  open line below / above
+  s S                  substitute char / line
+  C                    change to end of line
+  x X                  delete char under / before cursor
+  r{c} R               replace one char / replace mode
+  J gJ                 join lines with / without space
+  ~                    toggle case of char
+  .                    repeat last change
+  u  <C-r>             undo / redo
+  <C-a> <C-x>          increment / decrement number   (g<C-a> in visual = sequence)
+  p P                  paste after / before
+  ]p [p                paste with current indent
+  Y                    yank to end of line (Neovim default)
+
+VISUAL
+  v V <C-v>            char / line / block visual
+  o                    jump to other end of selection
+  I A  (block)         insert / append on every line of the block
+  $A   (block)         append at end of every line
+  :                    run a command on the selection (:'<,'>)
+
+REGISTERS
+  "ayy  "ap            yank into / paste from register a
+  "Ayy                 append to register a
+  "_                   black hole (delete without yanking)
+  "0                   last yank        "1-"9  last deletes
+  "+ "*                system clipboard
+  ".  "%  ":           last insert / file name / last command
+  <C-r>{reg}           insert register in insert/cmdline mode (<C-r>" = last yank)
+  :reg                 list registers
+
+MARKS AND JUMPS
+  ma  'a  `a           set mark a / jump to line / exact position
+  mA                   uppercase marks are global (across files)
+  ''  ``               back to position before last jump
+  `.  `^               last change / last insert position
+  `[  `]               start / end of last change or yank
+  <C-o> <C-i>          back / forward in jump list    (:jumps)
+  g; g,                back / forward in change list  (:changes)
+  gf                   open file under cursor
+  gx                   open URL / path under cursor with the system handler
+  <C-^>                alternate (previous) buffer
+  :marks               list marks
+
+MACROS
+  qa ... q             record into register a
+  @a  @@               play a / replay last played
+  Q                    replay last recorded macro
+  :norm @a             run macro on each line of a range / selection
+  @:                   repeat last : command
+
+SEARCH AND REPLACE
+  /pat ?pat            search forward / backward   (n N = next / prev)
+  /pat\c               case-insensitive search
+  :%s/a/b/g            replace all in file   (gc = confirm each, I = case-sens.)
+  :'<,'>s/a/b/g        replace in selection
+  &  g&                repeat last :s on line / whole file
+  :g/pat/d             run a command on matching lines (:v = non-matching)
+  :noh                 clear highlight   (<Esc> here)
+
+WINDOWS  (<C-w> + ...)
+  s v                  split horizontal / vertical
+  w  h j k l           next window / move left down up right
+  H J K L              move window to far left / bottom / top / right
+  c q o                close / quit / close all others
+  = _ |                equalise / max height / max width
+  + - < >              taller / shorter / narrower / wider
+  x r                  swap / rotate windows
+  T                    move window to a new tab
+  d                    diagnostics under cursor (Neovim default)
+
+TABS AND BUFFERS
+  gt gT  3gt           next / prev / go to tab 3   (gT is LSP type def here)
+  :tabnew :tabclose    new / close tab
+  ]b [b  ]B [B         next / prev / last / first buffer  (Neovim 0.11 default)
+  :ls  :b name  :bd    list / switch / delete buffer
+
+FOLDS
+  za zo zc             toggle / open / close fold
+  zR zM                open / close all folds
+  zj zk                next / prev fold
+
+INSERT MODE
+  <C-w> <C-u>          delete word / to line start
+  <C-o>{cmd}           run one normal-mode command
+  <C-t> <C-d>          indent / dedent current line
+  <C-r>{reg}           insert register
+  <C-v>{key}           insert key literally
+  <C-s>                signature help (Neovim default)
+
+COMMAND LINE
+  <C-r><C-w>           insert word under cursor
+  <C-f>  q:            edit command line in a window / command history
+  :earlier 10m         undo to 10 minutes ago   (:later 10m)
+  :sort  :sort u       sort lines / sort unique
+  :e!                  reload file, drop changes
+  :h {topic}           help   (<C-]> follows links, <C-o> goes back)
+
+NEOVIM 0.11 BRACKET DEFAULTS  (ç / º work here too)
+  ]q [q ]Q [Q          quickfix next / prev / last / first
+  ]l [l ]L [L          location list
+  ]b [b ]B [B          buffers
+  ]a [a ]A [A          argument list
+  ]t [t ]T [T          tags
+  ]d [d ]D [D          diagnostics
+  ]<Space> [<Space>    add blank line below / above

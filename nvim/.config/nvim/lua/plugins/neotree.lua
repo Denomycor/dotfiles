@@ -6,27 +6,19 @@ return {
 		"nvim-tree/nvim-web-devicons",
 		"MunifTanjim/nui.nvim",
 	},
-	cmd = "Neotree",
+  -- Loaded at startup so hijack_netrw_behavior can open `nvim <dir>`
   lazy = false,
 
 	init = function()
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
-    vim.api.nvim_create_autocmd("VimEnter", {
-        callback = function()
-          local arg = vim.fn.argv(0)
-          if vim.fn.isdirectory(arg) == 1 then
-            vim.cmd("Neotree reveal current dir=" .. arg)
-          end
-        end,
-      })
   end,
 
 	keys = {
-		{ "<leader>tt", ":Neotree left filesystem toggle<CR>", { desc = "NeoTree toggle" } },
-    { "<leader>tb", ":Neotree left buffers toggle<CR>", { desc = "NeoTree buffers" } },
-		{ "<leader>tf", ":Neotree float buffers toggle<CR>", { desc = "NeoTree float" } },
-		{ "<leader>tl", ":Neotree left<CR>", { desc = "NeoTree left" } },
+		{ "<leader>tt", "<cmd>Neotree left filesystem toggle<CR>", desc = "NeoTree toggle" },
+    { "<leader>tb", "<cmd>Neotree left buffers toggle<CR>", desc = "NeoTree buffers" },
+		{ "<leader>tf", "<cmd>Neotree float buffers toggle<CR>", desc = "NeoTree float" },
+		{ "<leader>tl", "<cmd>Neotree left<CR>", desc = "NeoTree left" },
 	},
 
   opts = {

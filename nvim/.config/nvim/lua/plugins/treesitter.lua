@@ -1,9 +1,12 @@
 return { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    branch = 'master', -- main branch is not working 
+    branch = 'master', -- main branch requires Neovim 0.12+ and tree-sitter-cli
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs',
-    dependencies = { 'nvim-treesitter/nvim-treesitter-context' },
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter-context',
+      { 'nvim-treesitter/nvim-treesitter-textobjects', branch = 'master' },
+    },
     opts = {
       ensure_installed = { 'bash', 'diff', 'html', 'lua', 'markdown' },
       auto_install = true,
@@ -15,6 +18,17 @@ return { -- Highlight, edit, and navigate code
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      -- ]f / [f also work as ºf / çf (PT-PT bracket aliases in keymaps.lua)
+      textobjects = {
+        move = {
+          enable = true,
+          set_jumps = true,
+          goto_next_start = { [']f'] = '@function.outer' },
+          goto_next_end = { [']F'] = '@function.outer' },
+          goto_previous_start = { ['[f'] = '@function.outer' },
+          goto_previous_end = { ['[F'] = '@function.outer' },
+        },
+      },
     },
 
 

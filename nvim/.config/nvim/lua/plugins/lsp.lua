@@ -19,12 +19,18 @@ return {
           -- local capabilities = require('blink.cmp').get_lsp_capabilities()
           -- vim.lsp.set_log_level("debug")
 
+          -- Remove Neovim's default gr* LSP maps; they make `gr` wait for timeoutlen
+          -- and are replaced by the maps below (grn, gra, grr, gri, grt)
+          for _, lhs in ipairs({ "grn", "gra", "grr", "gri", "grt" }) do
+            pcall(vim.keymap.del, "n", lhs)
+          end
+          pcall(vim.keymap.del, "x", "gra")
 
           vim.api.nvim_create_autocmd('LspAttach', {
             group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
             callback = function(event)
-              local map = function(keys, func, desc)
-                vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+              local map = function(keys, func, desc, mode)
+                vim.keymap.set(mode or 'n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
               end
 
               map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
@@ -34,7 +40,7 @@ return {
               map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
               map('<leader>ps', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[P]roject [S]ymbols')
               map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-              map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+              map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
               map('K', vim.lsp.buf.hover, 'Hover Documentation')
               map('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
               map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -81,20 +87,15 @@ return {
           })
 
           -- From here forward we override default lspconfig settings
-          vim.lsp.config("lua_ls", {
-            settings = {
-              Lua = {
-                diagnostics = {
-                  globals = { "vim" }
-                }
-              }
-            }
+          -- clangd logs info to stderr, which Neovim records as errors in lsp.log
+          vim.lsp.config("clangd", {
+            cmd = { "clangd", "--log=error" },
           })
 
           vim.lsp.config("godot", {
             cmd = vim.lsp.rpc.connect('127.0.0.1', 7011),
             filetypes = { "gdscript", "gdshader", "gdshaderinc" },
-            root_dir = vim.fs.root(0, { "project.godot", ".git" }),
+            root_markers = { "project.godot", ".git" },
           })
           vim.lsp.enable("godot")
 

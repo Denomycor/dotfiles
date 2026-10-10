@@ -2,11 +2,20 @@
 vim.opt.hlsearch = true
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
+-- PT-PT keyboard: [ and ] need AltGr+8 / AltGr+9, so ç and º (unshifted, next to L)
+-- act as the [ and ] prefixes for every bracket motion: çd/ºd, çq/ºq, ºf, çç/ºº, ...
+vim.keymap.set({ "n", "x", "o" }, "ç", "[", { remap = true, desc = "[ (PT-PT alias)" })
+vim.keymap.set({ "n", "x", "o" }, "º", "]", { remap = true, desc = "] (PT-PT alias)" })
+-- The alias only applies to the first key, so double-bracket motions need their own maps
+vim.keymap.set({ "n", "x", "o" }, "çç", "[[", { remap = true, desc = "[[ (PT-PT alias)" })
+vim.keymap.set({ "n", "x", "o" }, "ºº", "]]", { remap = true, desc = "]] (PT-PT alias)" })
+vim.keymap.set({ "n", "x", "o" }, "çº", "[]", { remap = true, desc = "[] (PT-PT alias)" })
+vim.keymap.set({ "n", "x", "o" }, "ºç", "][", { remap = true, desc = "][ (PT-PT alias)" })
+
 -- Diagnostic keymaps
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+vim.keymap.set("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, { desc = "Go to previous [D]iagnostic message" })
+vim.keymap.set("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, { desc = "Go to next [D]iagnostic message" })
+vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic location list" })
 
 
 -- Guess I'm not a true vimer
@@ -20,7 +29,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	desc = "Highlight when yanking (copying) text",
 	group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
 	callback = function()
-		vim.highlight.on_yank()
+		vim.hl.on_yank()
 	end,
 })
 
@@ -53,8 +62,7 @@ vim.keymap.set("x", "<leader>p", [["_dP]])
 -- vim.keymap.set("v", "<leader>y", "<cmd>w !clip.exe<CR><CR>")
 
 -- Navigate through lsp
-vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz")
-vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz")
+-- Quickfix list uses the built-in ]q / [q
 vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz")
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 vim.keymap.set("n", "<leader>ch", "<cmd>LspClangdSwitchSourceHeader<CR>")
