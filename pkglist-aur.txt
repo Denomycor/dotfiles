@@ -1,0 +1,6 @@
+brave-bin
+eww
+minecraft-launcher
+neofetch
+spotify
+yay

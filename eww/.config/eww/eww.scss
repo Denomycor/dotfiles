@@ -30,6 +30,14 @@
   border-radius: 20px 0px 0px 20px;
 }
 
+.brightness_box {
+  background-color: #6b5e38;
+}
+
+.power_box {
+  background-color: #4a7c59;
+}
+
 .wifi_box {
   background-color: #3d5a80;
 }
@@ -66,6 +74,39 @@
   background-color: #aa4444;
   border-style: hidden;
   border-radius: 20px;
-  
+
+}
+
+.notification_popups {
+  padding: 0px 10px;
+}
+
+.notification {
+  background-color: #000000;
+  color: #b0b4bc;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #33ccff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  box-shadow: 0px 4px 8px 0px rgba(26, 26, 26, 0.93);
+}
+
+.notification-icon {
+  border-radius: 8px;
+  border-style: hidden;
+  margin-right: 10px;
+}
+
+.notification-title {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.notification-body {
+  font-size: 14px;
+  font-weight: normal;
+  margin-top: 2px;
 }
 

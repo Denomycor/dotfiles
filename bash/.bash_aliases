@@ -26,6 +26,15 @@ makefile(){
     cp ~/.scripts/resx/makefile $(pwd)/$1/makefile
 }
 
+# sudo's password prompt doesn't understand bracketed paste, so pasting into
+# it (directly or via tmux forwarding) leaks ^[[200~ literally. Toggle it off
+# just for the duration of the sudo call.
+sudo(){
+    printf '\e[?2004l'
+    command sudo "$@"
+    printf '\e[?2004h'
+}
+
 alias ff='fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"'
 alias fnv='nvim "$(fzf --height 40% --reverse --preview "bat --style=numbers --color=always {}" --preview-window=up:30%)"'
 alias fcd='cd "$(find . -type d -o -type l -xtype d | fzf --height 40% --reverse --preview "ls -l {}")"'

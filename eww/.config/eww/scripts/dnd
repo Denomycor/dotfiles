@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+"""
+CLI for the notification daemon's do-not-disturb mode.
+
+Talks to notification_daemon.py over a unix socket rather than DBus --
+dnd is a local control-plane concern, not something freedesktop clients
+need to see or invoke.
+
+Usage:
+  dnd on      turn do-not-disturb on (notifications are dropped silently)
+  dnd off     turn do-not-disturb off
+  dnd mute    silence the notification sound (popups still show)
+  dnd unmute  restore the notification sound
+  dnd status  print the current dnd/mute state as JSON
+"""
+
+import os
+import socket
+import sys
+import tempfile
+
+SOCKET_PATH = os.path.join(
+    os.environ.get("XDG_RUNTIME_DIR", tempfile.gettempdir()), "eww-notification-daemon.sock"
+)
+
+COMMANDS = {"on", "off", "mute", "unmute", "status"}
+
+
+def main():
+    if len(sys.argv) != 2 or sys.argv[1] not in COMMANDS:
+        sys.exit(f"usage: {os.path.basename(sys.argv[0])} {{on|off|mute|unmute|status}}")
+
+    command = sys.argv[1]
+
+    try:
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
+            sock.connect(SOCKET_PATH)
+            sock.sendall(command.encode())
+            sock.shutdown(socket.SHUT_WR)
+            reply = sock.recv(256).decode().strip()
+    except (FileNotFoundError, ConnectionRefusedError):
+        sys.exit("dnd: notification daemon is not running")
+
+    print(reply)
+
+
+if __name__ == "__main__":
+    main()

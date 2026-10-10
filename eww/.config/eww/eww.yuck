@@ -1,11 +1,12 @@
-(defpoll time :interval "1m" :initial "initial-value" `date +%H:%M`)
-(defpoll wifi_name :interval "5s" :initial "initial-value" `nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d : -f 2`)
-(defpoll wifi_signal :interval "5s" :initial "initial-value" `nmcli -f ACTIVE,SSID,SIGNAL dev wifi | awk '$1=="yes"{print $3}'`)
-(defpoll battery_charge :interval "60s" :initial "initial-value" `upower -i $(upower -e | grep battery) | grep -E "percentage" | cut -f 2 -d : | tr -d '[:space:]%'`)
-
+(deflisten wifi "./scripts/wifi.sh")
+(deflisten time "./scripts/time.sh")
+(deflisten battery "./scripts/battery.sh")
 (deflisten audio "./scripts/audio.sh")
+(deflisten power_profile "./scripts/power_profile.sh")
+(deflisten brightness "./scripts/brightness.sh")
 (deflisten workspaces_monitor0 "./scripts/workspaces.sh 0")
 (deflisten workspaces_monitor1 "./scripts/workspaces.sh 1")
+(deflisten notifications :initial "[]" "./scripts/notification_daemon.py")
 
 (defwindow bar
     :monitor '["<primary>", 0]'
@@ -18,6 +19,20 @@
         :exclusive true
     :stacking "fg"
     (bar)
+)
+
+(defwindow notifications
+    :monitor '["<primary>", 0]'
+    :class "notifications_window"
+    :geometry (geometry :x "0%"
+        :y "50px"
+        :width "300px"
+        :height "1px"
+        :anchor "top right")
+    :exclusive false
+    :focusable false
+    :stacking "overlay"
+    (notification_popups)
 )
 
 ;; containers
@@ -44,20 +59,34 @@
 
 (defwidget right_widgets []
     (box :class "right_widgets" :orientation "h" :halign "end" :space-evenly false
-        (info_box :classo "battery_box" 
-            (icon_box :classo "" {battery_charge < "80" ? battery_charge < "30" ? "󰁻":"󰁾":"󰁹"})
+        (info_box :classo "battery_box"
+            (icon_box :classo "" {battery.state == "charging" ? "󰂄" : battery.charge < "80" ? battery.charge < "30" ? "󰁻":"󰁾":"󰁹"})
             (hspacer :space 8)
-            "${battery_charge}%"
+            "${battery.charge}%"
+        )
+        (info_box :classo "brightness_box"
+            (icon_box :classo "" {brightness < "33" ? "󰃞" : brightness < "66" ? "󰃟" : "󰃠"})
+            (hspacer :space 8)
+            "${brightness}%"
+        )
+        (info_box :classo "power_box"
+            (icon_box :classo "" {power_profile == "power-saver" ? "󰌪" : power_profile == "performance" ? "󰓅" : "󰾉"})
+            (hspacer :space 8)
+            {power_profile == "power-saver" ? "Saver" : power_profile == "performance" ? "Perf" : "Balanced"}
         )
         (info_box :classo "wifi_box"
-            (icon_box :classo "" {wifi_name == "" ? "󰤫":"󰤨"})
+            (icon_box :classo "" { wifi.ssid == "Disconnected" ? "󰤫" :
+                wifi.signal > 75 ? '󰤨' : 
+                wifi.signal > 50 ? '󰤥' : 
+                wifi.signal > 25 ? '󰤢' : 
+                wifi.signal > 0  ? '󰤟' : '󰤯'})
             (hspacer :space 10)
-            "${wifi_name} (${wifi_signal}%)"
+            "${wifi.ssid} (${wifi.signal}%)"
         )
         (info_box :classo "audio_box" 
-            (icon_box :classo "" {audio.volume < "50" ? audio.volume < "1" ? "󰝟":"󰖀":"󰕾"})
+            (icon_box :classo "" {audio.muted ? "󰝟" : audio.volume < "50" ? audio.volume < "1" ? "󰝟" : "󰖀" : "󰕾"})
             (hspacer :space 8)
-            "${audio.volume}%"
+            {audio.muted ? "Off" : "${audio.volume}%"}
         )
         (info_box :classo "clock_box" 
             (icon_box :classo "" "󰥔")
@@ -67,6 +96,20 @@
     )
 )
 
+
+(defwidget notification_popups []
+    (box :class "notification_popups" :orientation "v" :space-evenly false :halign "end" :valign "start"
+        (for notif in notifications
+            (box :class "notification" :orientation "h" :space-evenly false
+                (image :class "notification-icon" :path {notif.icon} :image-width 40 :image-height 40 :visible {notif.icon != ""})
+                (box :orientation "v" :space-evenly false :halign "start" :hexpand true
+                    (label :class "notification-title" :halign "start" :limit-width 30 :text {notif.summary})
+                    (label :class "notification-body" :halign "start" :wrap true :text {notif.body})
+                )
+            )
+        )
+    )
+)
 
 ;; building blocks
 
